@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro&family=Literata">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <title>KARU</title>
+
+        <style>
+*{
+    padding: 0;
+    margin: 0;
+    font-family: 'Kanit', serif;
+    box-sizing: border-box;
+}            
+body{
+    width: 100%;
+    height: 100vh;
+    background-color: rgb(43, 43, 43);
+}
+.chat{
+    display: flex;
+    gap: 20px;
+    padding: 25px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 300;
+}
+
+.chat img{
+    width: 35px;
+    height: 35px;
+}
+.response{
+    background-color: #636363;
+}
+.messagebar{
+    position: fixed;
+    bottom: 0;
+    height: 5rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #ffffff;
+    background-color: #949494;
+}
+
+.messagebar .bar-wrapper{
+    background-color: rgb(43, 43, 43);
+    border-radius: 5px;
+    width: 60vw;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content:  space-between;
+}
+
+.bar-wrapper input{
+    width: 100%;
+    padding: 5px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    background: none;
+    color: #bebebe;
+}
+
+.bar-wrapper input::placeholder{
+    color: #ffffff;
+}
+.messagebar button{
+    display: flex;
+    align-items:  center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #cfcfcf;
+    cursor: pointer;
+}
+.message-box{
+    height:  calc(100vh - 5rem);
+    overflow-y: auto;
+}
+.chatbot-img {
+    margin-left: 25px;
+    width: 35px;
+    height: 35px;
+}
+.chatbot{
+    gap: 20px;
+    color: #ffffff;
+    padding: 25px;
+    font-weight: 300;
+}
+    </style>
+</head>
+
+<body>
+    <div class="chatbox-wrapper">
+        <div class="message-box">
+            <div class="chat response">
+                <img src="https://www.cio.com/wp-content/uploads/2023/08/chatbot_ai_machine-learning_emerging-tech-100778305-orig.jpg?resize=1024%2C683&quality=50&strip=all">
+                <span> Hi Professor<br>
+                    How can I help you today?
+                </span>
+            </div>
+        </div>
+        <div class="messagebar">
+            <div class="bar-wrapper">
+                <input id="user-input" type="text" placeholder="Enter your message...">
+                <button onclick="sendMessage()">
+                    <span class="material-symbols-rounded">
+                        Send
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const userMessage = userInput.value.trim();
+
+            if (userMessage !== '') {
+                const chatbox = document.querySelector(`.message-box`);
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat', 'user');
+                messageDiv.innerHTML = `<img src="https://cdn.rafled.com/anime-icons/images/H1QAYUF2BP6GYrAHwTdkqP4TDd3EWYko.jpg"><span>${userMessage}</span>`;
+                chatbox.appendChild(messageDiv);
+            
+
+                userInput.value = '';
+
+                fetch('/api/gpt-response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: userMessage
+                    }),
+                })
+        
+                    .then(response => response.json())
+                    .then(data => {
+                        const botMessage = data.result;
+                        const botMessageDiv = document.createElement('div');
+                            botMessageDiv.innerHTML = `<img class="chatbot-img" src="https://www.cio.com/wp-content/uploads/2023/08/chatbot_ai_machine-learning_emerging-tech-100778305-orig.jpg?resize=1024,683&quality=50&strip=all"><span class="chatbot">${botMessage}</span>`;
+                            chatbox.appendChild(botMessageDiv);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+    
+</body>
+</html>
